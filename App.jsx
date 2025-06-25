@@ -16,7 +16,7 @@ export default function App() {
                     component={HomeScreen}
                     options={{
                         title: 'Tela Principal',
-                        headerStyle: { backgroundColor: '#007bff' },
+                        headerStyle: { backgroundColor: '#C8BFE7' },
                         headerTintColor: '#fff',
                     }}
                 />

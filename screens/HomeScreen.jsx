@@ -35,7 +35,7 @@ export default function HomeScreen({ navigation }) {
         style={styles.list}
       />
       <TouchableOpacity
-        style={[styles.button, { backgroundColor: '#28a745' }]}
+        style={[styles.button, { backgroundColor: '#C3C3C3' }]}
         onPress={() => navigation.navigate('AddTask')}
       >
         <Text style={styles.buttonText}>Adicionar tarefa</Text>
