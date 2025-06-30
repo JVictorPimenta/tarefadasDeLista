@@ -1,5 +1,5 @@
+import { useState, useEffect } from 'react';
 import { StyleSheet, View, Text, FlatList, TouchableOpacity } from 'react-native';
-import { useState } from 'react';
 
 const initialData = [
   { id: '1', title: 'Item 1', description: 'Descrição do item 1', completed: false },
@@ -9,9 +9,19 @@ const initialData = [
   { id: '5', title: 'Item 5', description: 'Descrição do item 5', completed: false },
 ];
 
-export default function HomeScreen({ navigation }) {
+export default function HomeScreen({ navigation, route }) {
   const [data, setData] = useState(initialData);
   const [filter, setFilter] = useState('all');
+
+  useEffect(() => {
+    if (route.params?.updatedItem) {
+      setData(data.map(item => 
+        item.id === route.params.updatedItem.id 
+          ? route.params.updatedItem 
+          : item
+      ));
+    }
+  }, [route.params]);
 
   const toggleComplete = (id) => {
     setData(data.map(item =>
@@ -90,6 +100,7 @@ export default function HomeScreen({ navigation }) {
     </View>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {
