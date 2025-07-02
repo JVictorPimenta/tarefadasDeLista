@@ -1,38 +1,22 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { StyleSheet, View, Text, FlatList, TouchableOpacity } from 'react-native';
+import { useTasks } from '../context/TaskContext';
 
-const initialData = [
-  { id: '1', title: 'Item 1', description: 'Descrição do item 1', completed: false },
-  { id: '2', title: 'Item 2', description: 'Descrição do item 2', completed: false },
-  { id: '3', title: 'Item 3', description: 'Descrição do item 3', completed: false },
-  { id: '4', title: 'Item 4', description: 'Descrição do item 4', completed: false },
-  { id: '5', title: 'Item 5', description: 'Descrição do item 5', completed: false },
-];
-
-export default function HomeScreen({ navigation, route }) {
-  const [data, setData] = useState(initialData);
+export default function HomeScreen({ navigation }) {
+  const { tasks, toggleComplete } = useTasks();
   const [filter, setFilter] = useState('all');
+  const [priorityFilter, setPriorityFilter] = useState('all');
 
-  useEffect(() => {
-    if (route.params?.updatedItem) {
-      setData(data.map(item => 
-        item.id === route.params.updatedItem.id 
-          ? route.params.updatedItem 
-          : item
-      ));
-    }
-  }, [route.params]);
+  const filteredData = tasks.filter(item => {
+    const statusOk =
+      filter === 'all' ||
+      (filter === 'completed' && item.completed) ||
+      (filter === 'pending' && !item.completed);
 
-  const toggleComplete = (id) => {
-    setData(data.map(item =>
-      item.id === id ? { ...item, completed: !item.completed } : item
-    ));
-  };
+    const priorityOk =
+      priorityFilter === 'all' || item.priority === priorityFilter;
 
-  const filteredData = data.filter(item => {
-    if (filter === 'completed') return item.completed;
-    if (filter === 'pending') return !item.completed;
-    return true;
+    return statusOk && priorityOk;
   });
 
   const renderItem = ({ item }) => (
@@ -46,6 +30,9 @@ export default function HomeScreen({ navigation, route }) {
         </Text>
         <Text style={[styles.cardDescription, item.completed && styles.completedText]}>
           {item.description}
+        </Text>
+        <Text style={{ color: '#888', marginTop: 4 }}>
+          Prioridade: {item.priority}
         </Text>
       </TouchableOpacity>
       <TouchableOpacity
@@ -84,6 +71,33 @@ export default function HomeScreen({ navigation, route }) {
         </TouchableOpacity>
       </View>
 
+      <View style={styles.filterContainer}>
+        <TouchableOpacity
+          style={[styles.filterButton, priorityFilter === 'all' && styles.filterAllActive]}
+          onPress={() => setPriorityFilter('all')}
+        >
+          <Text style={styles.filterButtonText}>Todas Prioridades</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.filterButton, priorityFilter === 'high' && styles.filterCompletedActive]}
+          onPress={() => setPriorityFilter('high')}
+        >
+          <Text style={styles.filterButtonText}>Alta</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.filterButton, priorityFilter === 'medium' && styles.filterPendingActive]}
+          onPress={() => setPriorityFilter('medium')}
+        >
+          <Text style={styles.filterButtonText}>Média</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.filterButton, priorityFilter === 'low' && styles.filterAllActive]}
+          onPress={() => setPriorityFilter('low')}
+        >
+          <Text style={styles.filterButtonText}>Baixa</Text>
+        </TouchableOpacity>
+      </View>
+
       <FlatList
         data={filteredData}
         renderItem={renderItem}
@@ -100,8 +114,6 @@ export default function HomeScreen({ navigation, route }) {
     </View>
   );
 }
-
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -117,8 +129,9 @@ const styles = StyleSheet.create({
   },
   filterContainer: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     justifyContent: 'center',
-    marginBottom: 20,
+    marginBottom: 10,
     gap: 10,
   },
   filterButton: {
@@ -128,6 +141,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#2C2C2C',
     backgroundColor: '#1E1E1E',
+    margin: 5,
   },
   filterAllActive: {
     backgroundColor: '#6F2DA8',

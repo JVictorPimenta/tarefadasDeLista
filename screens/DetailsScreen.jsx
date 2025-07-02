@@ -10,6 +10,7 @@ import {
   KeyboardAvoidingView,
   Platform
 } from 'react-native';
+import { useTasks } from '../context/TaskContext';
 
 export default function DetailsScreen({ navigation, route }) {
   const { item } = route.params || {};
@@ -20,11 +21,11 @@ export default function DetailsScreen({ navigation, route }) {
     title: item?.title || '',
     description: item?.description || ''
   });
+  const { updateTask } = useTasks();
 
-  // Tema escuro com ajustes visuais
   const theme = {
     background: '#121212',
-    cardBg: '#2D2D2D',  // Cinza mais claro para a caixa central
+    cardBg: '#2D2D2D',
     textPrimary: '#FFFFFF',
     textSecondary: '#BDBDBD',
     border: '#424242',
@@ -34,16 +35,13 @@ export default function DetailsScreen({ navigation, route }) {
     buttonEdit: '#1976D2'
   };
 
-  // Atualiza a HomeScreen quando sai da tela
   useEffect(() => {
     return () => {
       if (title !== originalData.title || description !== originalData.description) {
-        navigation.navigate('Home', {
-          updatedItem: {
-            ...item,
-            title,
-            description
-          }
+        updateTask({
+          ...item,
+          title,
+          description
         });
       }
     };
@@ -84,7 +82,6 @@ export default function DetailsScreen({ navigation, route }) {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={[styles.container, { backgroundColor: theme.background }]}
     >
-      {/* Cabeçalho editável */}
       <View style={styles.header}>
         {isEditing ? (
           <TextInput
@@ -102,7 +99,6 @@ export default function DetailsScreen({ navigation, route }) {
         )}
       </View>
 
-      {/* Área de conteúdo rolável */}
       <ScrollView 
         contentContainerStyle={styles.scrollContainer}
         keyboardShouldPersistTaps="handled"
@@ -132,7 +128,6 @@ export default function DetailsScreen({ navigation, route }) {
         </View>
       </ScrollView>
 
-      {/* Botões arredondados */}
       <View style={styles.footer}>
         <TouchableOpacity
           style={[

@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useTasks } from '../context/TaskContext';
 
 export default function AddTaskScreen({ navigation }) {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [priority, setPriority] = useState('medium');
+  const { addTask } = useTasks();
 
   const handleConfirm = () => {
     if (!title.trim()) {
@@ -22,10 +24,8 @@ export default function AddTaskScreen({ navigation }) {
       createdAt: new Date().toISOString(),
     };
 
-    navigation.navigate('Home', {
-      screen: 'Home',
-      params: { newItem },
-    });
+    addTask(newItem);
+    navigation.goBack();
   };
 
   const handleCancel = () => {
@@ -107,7 +107,6 @@ export default function AddTaskScreen({ navigation }) {
     </ScrollView>
   );
 }
-
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
